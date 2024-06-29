@@ -5,8 +5,10 @@ public class TimeComponent : MonoBehaviour
 {
     [SerializeField] private int minutos;
     [SerializeField] private int segundos;
+    private PointComponent points;
 
     void Start(){
+        points = gameObject.GetComponent<PointComponent>();
         StartCoroutine("CountDown");
     }
 
@@ -18,7 +20,11 @@ public class TimeComponent : MonoBehaviour
         while (GetSegundos() > 0){
             segundos -= 1;
             if (segundos < 0 && minutos > 0){segundos = 59; minutos-=1;}
-            else{} //TODO: FIN DE LA PARTIDA
+            else{
+                if (points.Ganas()){} //TODO: Has ganado
+                else{} //TODO: Pierdes
+                //TODO: Volver al menú
+            } 
             yield return new WaitForSeconds(1f);
         }
     }

@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class ShipComponent : MonoBehaviour
 {
+    public static int BLUETEAM = 1;
+    public static int REDTEAM = -1;
+    public static int NEUTRAL = 0;
     [SerializeField] private int vida;
     [SerializeField] private int equipo;
     [SerializeField] private float velocidadDeRotacionDeTorreta;
