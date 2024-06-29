@@ -21,11 +21,11 @@ public class BulletComponent : MonoBehaviour
     {
         if(col.gameObject.GetComponent<ShipComponent>() != null){
             ShipComponent collidingShip = col.gameObject.GetComponent<ShipComponent>();
-            if(collidingShip.gameObject != ship.gameObject && collidingShip.GetEquipo() != ship.GetEquipo()){
+            if(collidingShip.gameObject != ship.gameObject && collidingShip.GetEquipo() != ship.GetEquipo() && collidingShip.alive){
                 collidingShip.Dañar(ship.GetDañoBalas());
                 Destroy(this.gameObject);
             }
         }
-        else{Destroy(this.gameObject);}
+        else if(!col.isTrigger){Destroy(this.gameObject);}
     }
 }
