@@ -25,7 +25,8 @@ public class AIMaster : MonoBehaviour
 
     void Update()
     {
-        foreach (AIActorComponent AI in ais)
+        List<AIActorComponent> tmp = ais;
+        foreach (AIActorComponent AI in tmp)
         {
             if(AI.GetComponent<ShipComponent>().GetVida() <= 0){Delete(AI);}
             else if((AI.toIsland ||AI.InDestination()) && AI.GetComponent<ShipComponent>().GetEquipo() == -1 && CloseToPlayer(AI.gameObject.transform.position)){

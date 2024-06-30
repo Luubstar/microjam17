@@ -184,11 +184,11 @@ MonoBehaviour:
   icono: {fileID: 8795650947482914460}
   vida: 3
   equipo: 1
-  velocidadDeRotacionDeTorreta: 40
+  velocidadDeRotacionDeTorreta: 60
   velocidadAvance: 0.4
   velocidadGiro: 0.006
   fuerzaDeDisparo: 15
-  "da\xF1obalas": 0
+  "da\xF1obalas": 1
   tiempoRecarga: 1
   gunComponents:
   - {fileID: 8062835987162212084}
@@ -277,6 +277,9 @@ MonoBehaviour:
   agent: {fileID: 7597958042796781176}
   rotationSpeed: 20
   toIsland: 0
+  entityLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!195 &7597958042796781176
 NavMeshAgent:
   m_ObjectHideFlags: 0

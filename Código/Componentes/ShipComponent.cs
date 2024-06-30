@@ -55,6 +55,26 @@ public class ShipComponent : MonoBehaviour
     public void MejorarDaño(){dañobalas++;}
     public void Dañar(int daño){vida -= daño;}
 
+    public void Aim(Vector3 p){
+        for(int i = 0; i < GetGunComponents().Length; i++){
+            GunComponent gun = GetGunComponents()[i];
+            gun.Aim(p);
+        }
+    }
+    public void Shoot(){
+        for(int i = 0; i < GetGunComponents().Length; i++){
+            GunComponent gun = GetGunComponents()[i];
+            gun.Shoot();
+        }
+    }
+
+    public bool GunsAimed(Vector3 p){
+        for(int i = 0; i < GetGunComponents().Length; i++){
+                GunComponent gun = GetGunComponents()[i];
+                if(!gun.isAimed(p)){return false;}
+            }
+        return true;
+    }
 
     IEnumerator Hundirse(){ 
         float v = 0f;

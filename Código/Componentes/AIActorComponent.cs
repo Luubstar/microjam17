@@ -9,10 +9,15 @@ public class AIActorComponent : MonoBehaviour
     public UnityEngine.AI.NavMeshAgent agent;
     public float rotationSpeed;
     public bool toIsland;
+    GameObject objective;
+    public LayerMask entityLayer;
+    ShipComponent ship;
     void Start()
     {
+        ship = gameObject.GetComponent<ShipComponent>();
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.updateRotation = false;
+        StartCoroutine("FindObjective");
     }
 
     void Update()
@@ -31,6 +36,38 @@ public class AIActorComponent : MonoBehaviour
                 // Rota suavemente hacia la rotación deseada
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
             }
+        }
+        if(objective != null){
+            Vector3 aimPos = objective.transform.position + (Vector3) objective.gameObject.GetComponent<Rigidbody2D>().velocity * 1.5f + (Vector3) gameObject.GetComponent<Rigidbody2D>().velocity * 1.5f;
+            if(ship.GunsAimed(aimPos)){
+                ship.Shoot();
+            }
+            else{
+                ship.Aim(aimPos);
+            }
+        }
+    }
+
+    IEnumerator FindObjective(){
+        while(true){
+            if(objective == null  || (objective.transform.position - this.gameObject.transform.position).magnitude > 40f){
+                Collider2D[] colliders = Physics2D.OverlapCircleAll(this.gameObject.transform.position, 40, entityLayer);
+                // Iterar sobre los colliders encontrados
+                ShipComponent closest = null;
+                foreach (Collider2D col in colliders)
+                {
+                    if(col.gameObject.GetComponent<ShipComponent>() != null){
+                        ShipComponent s = col.gameObject.GetComponent<ShipComponent>();
+                        if(s.GetEquipo() != ship.GetEquipo()){
+                            if(closest == null || closest.gameObject.transform.position.magnitude > s.gameObject.transform.position.magnitude){
+                                closest = s;
+                            }
+                        }
+                    }
+                }
+                if(closest != null){objective = closest.gameObject;}
+            }
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
