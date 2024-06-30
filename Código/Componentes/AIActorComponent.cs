@@ -12,6 +12,8 @@ public class AIActorComponent : MonoBehaviour
     GameObject objective;
     public LayerMask entityLayer;
     ShipComponent ship;
+    public AIMaster master;
+
     void Start()
     {
         ship = gameObject.GetComponent<ShipComponent>();
@@ -20,38 +22,43 @@ public class AIActorComponent : MonoBehaviour
         StartCoroutine("FindObjective");
     }
 
+
     void Update()
     {
-        if (agent.hasPath && agent.isOnNavMesh)
-        {
-           Vector3 direction = agent.steeringTarget - transform.position;
-            direction.z = 0; // Asegúrate de que la dirección sea 2D
-
-            // Si la dirección no es cero, rota hacia ella
-            if (direction != Vector3.zero)
+        if(!agent.isStopped && !master.playing){agent.isStopped = master.playing;}
+        if(master.playing){
+            if(!ship.alive){agent.isStopped = false;}
+            else if (agent.hasPath && agent.isOnNavMesh && ship.alive)
             {
-                // Calcula la rotación deseada hacia el objetivo
-                Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
+                Vector3 direction = agent.steeringTarget - transform.position;
+                direction.z = 0; // Asegúrate de que la dirección sea 2D
 
-                // Rota suavemente hacia la rotación deseada
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                // Si la dirección no es cero, rota hacia ella
+                if (direction != Vector3.zero)
+                {
+                    // Calcula la rotación deseada hacia el objetivo
+                    Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
+
+                    // Rota suavemente hacia la rotación deseada
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                }
             }
-        }
-        if(objective != null){
-            Vector3 aimPos = objective.transform.position + (Vector3) objective.gameObject.GetComponent<Rigidbody2D>().velocity * 1.5f + (Vector3) gameObject.GetComponent<Rigidbody2D>().velocity * 1.5f;
-            if(ship.GunsAimed(aimPos)){
-                ship.Shoot();
-            }
-            else{
-                ship.Aim(aimPos);
+            if(objective != null && ship.alive){
+                Vector3 aimPos = objective.transform.position + (Vector3) objective.gameObject.GetComponent<Rigidbody2D>().velocity * 1.5f + (Vector3) gameObject.GetComponent<Rigidbody2D>().velocity * 1.5f;
+                if(ship.GunsAimed(aimPos)){
+                    ship.Shoot();
+                }
+                else{
+                    ship.Aim(aimPos);
+                }
             }
         }
     }
 
     IEnumerator FindObjective(){
         while(true){
-            if(objective == null  || (objective.transform.position - this.gameObject.transform.position).magnitude > 40f){
-                Collider2D[] colliders = Physics2D.OverlapCircleAll(this.gameObject.transform.position, 40, entityLayer);
+            if(objective == null  || (objective.transform.position - this.gameObject.transform.position).magnitude > 30f){
+                Collider2D[] colliders = Physics2D.OverlapCircleAll(this.gameObject.transform.position, 30, entityLayer);
                 // Iterar sobre los colliders encontrados
                 ShipComponent closest = null;
                 foreach (Collider2D col in colliders)

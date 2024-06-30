@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 public class UIComponent : MonoBehaviour
 {
     private TimeComponent time;
     private PointComponent points;
     [SerializeField] private TMP_Text tiempoText;
     [SerializeField] private TMP_Text dineroText;
-    [SerializeField] private TMP_Text conquistaText;
     [SerializeField] private GameObject botonMain;
     [SerializeField] private Button[] buttons;
     [SerializeField] private Button vidaBoton;
@@ -17,7 +17,13 @@ public class UIComponent : MonoBehaviour
     [SerializeField] private Button cañonesBoton;
     [SerializeField] private Button velocidadBoton;
     [SerializeField] private Button añadirIA;
+    public GameObject pausaMenu;
+    public MapGeneration map;
+    public Slider slider;
+    public GameObject Victoria;
+    public GameObject Derrota;
     public AIMaster aimaster;
+    public GameObject help;
     void Start()
     {
         time = gameObject.GetComponent<TimeComponent>();
@@ -27,9 +33,10 @@ public class UIComponent : MonoBehaviour
 
     void Update()
     {
-        tiempoText.SetText(time.GetSegundos() + " s");
-        dineroText.SetText(points.GetMonedasJugador() + "$");
-        conquistaText.SetText(points.Ganas() + " ");
+        slider.value = points.Ganas();
+
+        tiempoText.SetText(time.ToString());
+        dineroText.SetText(points.GetMonedasJugador() +"");
 
         velocidadBoton.interactable = points.puedeMejorarVelocidad;
         balasBoton.interactable = points.puedeMejorarDaño;
@@ -45,4 +52,23 @@ public class UIComponent : MonoBehaviour
     public void ClickButton(int button){
         buttons[button-1].onClick.Invoke();
     }
+
+    public void Pause(bool val){
+        pausaMenu.SetActive(val);
+    }
+
+    public void Retry(){
+        SceneManager.LoadScene(1);
+    }
+
+    public void Exit(){
+        Application.Quit();
+    }
+
+    public void Win(bool w){
+        if(w){Victoria.SetActive(true);}
+        else{Derrota.SetActive(false);}
+    }
+
+    public void Help(bool h){help.SetActive(h);}
 }

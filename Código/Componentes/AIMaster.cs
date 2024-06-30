@@ -16,6 +16,10 @@ public class AIMaster : MonoBehaviour
     public List<GameObject> enemies;
     public List<GameObject> allies;
     public List<AIActorComponent> ais;
+    public List<AIActorComponent> delete;
+    int smallPrice = 15;
+    int bigPrice = 30;
+    public bool playing = true;
 
     void Start()
     {
@@ -28,7 +32,7 @@ public class AIMaster : MonoBehaviour
         List<AIActorComponent> tmp = ais;
         foreach (AIActorComponent AI in tmp)
         {
-            if(AI.GetComponent<ShipComponent>().GetVida() <= 0){Delete(AI);}
+            if(AI == null){delete.Add(AI);}
             else if((AI.toIsland ||AI.InDestination()) && AI.GetComponent<ShipComponent>().GetEquipo() == -1 && CloseToPlayer(AI.gameObject.transform.position)){
                 AI.toIsland = false;
                 AI.SetDestination(GetPoint(player.gameObject.transform.position, 30f));
@@ -38,7 +42,20 @@ public class AIMaster : MonoBehaviour
                 AI.SetDestination(GetPoint( GetClosest(AI.transform.position, AI.GetComponent<ShipComponent>().GetEquipo()), 20f));
             }
         }
+        
+        tmp = delete;
+        foreach(AIActorComponent a in tmp){
+            if(a != null){
+                ais.Remove(a);
+                if(enemies.Contains(a.gameObject)) {enemies.Remove(a.gameObject);}
+                if(allies.Contains(a.gameObject)) {allies.Remove(a.gameObject);}
+                Destroy(a.gameObject);
+            }
+        }
+        delete.Clear();
     }
+    
+    public void Delete(AIActorComponent a){delete.Add(a);}
 
     public Vector3 GetClosest(Vector3 origin, int e){
         List<Vector3> i = new List<Vector3>();
@@ -58,19 +75,14 @@ public class AIMaster : MonoBehaviour
         }
 
         foreach(IslandComponent island in map.islasGeneradas){
-            if(island.equipoConquistado != e && (island.gameObject.transform.position - origin).magnitude < 50f){i.Add(island.gameObject.transform.position);}
+            if(island.equipoConquistado != e){i.Add(island.gameObject.transform.position);}
         }
 
         i.Sort((obj1, obj2) => (obj1 - origin).magnitude.CompareTo((obj2 - origin).magnitude));
-        int r = Random.Range(0,Math.Min(2, i.Count));
+        if(i.Count == 0){return player.transform.position;}
+        int r = Random.Range(0,Math.Min(2, i.Count-1));
         if(r<0){r = 0;}
         return i[r];
-    }
-
-    public void Delete(AIActorComponent a){
-        ais.Remove(a);
-        enemies.Remove(a.gameObject);
-        Destroy(a.gameObject);
     }
 
     public bool CloseToPlayer(Vector3 pos){
@@ -92,17 +104,17 @@ public class AIMaster : MonoBehaviour
 
     IEnumerator Comprar(){
         while(true){
-            while(enemies.Count < 6 && puntos.monedasIA >= 10){
+            while(enemies.Count < 3 && puntos.monedasIA >= smallPrice){
                 BuildEnemyShip();
-                puntos.monedasIA -= 10;
+                puntos.monedasIA -= smallPrice;
             }
 
-            while(puntos.monedasIA >= 10 && enemies.Count < 10){
+            while(puntos.monedasIA >= smallPrice && enemies.Count < 15){
                 float random = Random.Range(1,10);
-                if(random%2 == 0 && puntos.monedasIA >= 10){BuildEnemyShip();
-                puntos.monedasIA -= 10;}
-                else if (puntos.monedasIA >=20){BuildBigEnemyShip();
-                puntos.monedasIA -= 20;}
+                if(random%2 == 0 && puntos.monedasIA >= smallPrice){BuildEnemyShip();
+                puntos.monedasIA -= smallPrice;}
+                else if (puntos.monedasIA >=bigPrice){BuildBigEnemyShip();
+                puntos.monedasIA -= bigPrice;}
             }
             yield return new WaitForSeconds(15);
         }
@@ -114,6 +126,7 @@ public class AIMaster : MonoBehaviour
         IA.GetComponent<AIActorComponent>().player = player;
         IA.GetComponent<ShipComponent>().time = time;
         ais.Add(IA.GetComponent<AIActorComponent>());
+        IA.GetComponent<AIActorComponent>().master = this;
         AddAI(IA.GetComponent<AIActorComponent>());
     }
 
@@ -123,10 +136,15 @@ public class AIMaster : MonoBehaviour
         IA.GetComponent<AIActorComponent>().player = player;
         IA.GetComponent<ShipComponent>().time = time;
         ais.Add(IA.GetComponent<AIActorComponent>());
+        IA.GetComponent<AIActorComponent>().master = this;
         AddAI(IA.GetComponent<AIActorComponent>());
     }
 
-    public void AddAI(AIActorComponent ai){ais.Add(ai); allies.Add(ai.gameObject);}
+    public void AddAI(AIActorComponent ai){
+        ai.gameObject.GetComponent<ShipComponent>().time = time;
+        ais.Add(ai); 
+        allies.Add(ai.gameObject);
+        ai.master = this;}
 
     public bool canAddAllies(){return allies.Count <= 10;}
 }

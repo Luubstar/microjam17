@@ -10,13 +10,15 @@ public class GunComponent : MonoBehaviour
     [SerializeField] private GameObject[] cañonesNivel4;
     private GameObject[] cañonesActivos;
     private int ultimoDisparo = -1;
-    private TimeComponent time;
+    public TimeComponent time;
     private ShipComponent ship;
     private float horquillaAngulo = 1f;
     int level = 1;
+    private AudioSource source;
 
     void Start(){
         cañonesActivos = cañonesNivel1;
+        source = gameObject.GetComponent<AudioSource>();
     }
 
     public void SetShip(ShipComponent s){ship = s;}
@@ -62,6 +64,7 @@ public class GunComponent : MonoBehaviour
                 rb.velocity = ship.GetComponent<Rigidbody2D>().velocity;
                 rb.AddForce(transform.right * ship.GetFuerzaDeDisparo(), ForceMode2D.Impulse);
             }
+            source.Play();
         }
     }
 

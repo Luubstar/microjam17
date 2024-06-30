@@ -52,6 +52,38 @@ PrefabInstance:
       propertyPath: m_Name
       value: BarcoIA Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 3571801849547065179, guid: c03b2ba7e0a3d6c48a5cf3c2643596e6, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3571801849547065179, guid: c03b2ba7e0a3d6c48a5cf3c2643596e6, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3571801849547065179, guid: c03b2ba7e0a3d6c48a5cf3c2643596e6, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3571801849547065179, guid: c03b2ba7e0a3d6c48a5cf3c2643596e6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 3571801849547065179, guid: c03b2ba7e0a3d6c48a5cf3c2643596e6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.78
+      objectReference: {fileID: 0}
+    - target: {fileID: 3571801849547065179, guid: c03b2ba7e0a3d6c48a5cf3c2643596e6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3571801849547065179, guid: c03b2ba7e0a3d6c48a5cf3c2643596e6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3571801849547065179, guid: c03b2ba7e0a3d6c48a5cf3c2643596e6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4423231525636548500, guid: c03b2ba7e0a3d6c48a5cf3c2643596e6, type: 3}
       propertyPath: m_Points.m_Paths.Array.data[0].Array.data[0].x
       value: 0.06346366
@@ -334,6 +366,7 @@ MonoBehaviour:
   entityLayer:
     serializedVersion: 2
     m_Bits: 1
+  master: {fileID: 0}
 --- !u!114 &5410441080194015395
 MonoBehaviour:
   m_ObjectHideFlags: 0

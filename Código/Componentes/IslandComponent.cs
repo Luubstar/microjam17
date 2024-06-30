@@ -18,8 +18,8 @@ public class IslandComponent : MonoBehaviour
     void Update(){
         float t = Mathf.Clamp01(Math.Abs(puntosDeConquista) / 100f);
         bandera.transform.position = Vector3.Lerp(posiciones[1].transform.position, posiciones[0].transform.position, 1-t);
-        if(puntosDeConquista > 0){bandera.GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 1f);}
-        else if(puntosDeConquista < 0){bandera.GetComponent<SpriteRenderer>().color = new Color(1f, 0f, 0f);}
+        if(puntosDeConquista > 0){bandera.GetComponent<SpriteRenderer>().color = ShipComponent.BLUE;}
+        else if(puntosDeConquista < 0){bandera.GetComponent<SpriteRenderer>().color = ShipComponent.RED;}
     }
 
     IEnumerator Conquista(){

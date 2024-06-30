@@ -15,6 +15,10 @@ public class PlayerComponent : MonoBehaviour
     [SerializeField] private float MinimoEspacioCamara;
     [SerializeField] private UIComponent UI;
     [SerializeField] private GameObject IAAliado;
+    bool playing = true;
+    bool onHelp = false;
+
+    public GameObject puntero;
     
     public void GenerarAliado(){
         GameObject IA = Instantiate(IAAliado, ship.spawnpoint.position, ship.spawnpoint.rotation);
@@ -24,8 +28,8 @@ public class PlayerComponent : MonoBehaviour
     }
 
     public void MejorarVelocidad(){
-        ship.velocidadAvance += 0.05f;
-        ship.velocidadGiro += 0.001f;
+        ship.velocidadAvance += 0.2f;
+        ship.velocidadGiro += 0.01f;
     }
 
     public void MejorarCañones(){
@@ -37,12 +41,27 @@ public class PlayerComponent : MonoBehaviour
         moveComponent = gameObject.GetComponent<MoveComponent>();
         ship = gameObject.GetComponent<ShipComponent>();
         Respawn();
+        ai.playing = true;
+        Pause();
+        Pause();
     }
 
     void Update(){
-        if(ship.alive){
+
+        Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouse.z = 2;
+        puntero.transform.position = mouse;
+
+        if(!ship.canShoot()){puntero.GetComponent<SpriteRenderer>().color = new Color(1f,0f,0f);}
+        else if(!ship.GunsAimed(mouse)){puntero.GetComponent<SpriteRenderer>().color = new Color(1f,1f,1f);}
+        else {puntero.GetComponent<SpriteRenderer>().color = new Color(0f,1f,0f);}
+
+
+        if(Input.GetKeyDown("escape") && !onHelp){Pause();}
+        if(Input.GetKeyDown(KeyCode.F1) && (onHelp || playing)){Help();}
+        if (ship.alive && playing){
             if(Math.Abs(Input.GetAxis("Horizontal")) > 0 || Math.Abs(Input.GetAxis("Vertical")) > 0){
-                moveComponent.Move(Input.GetAxis("Vertical"),Input.GetAxis("Horizontal"));}
+                moveComponent.Move(Input.GetAxis("Vertical"),Input.GetAxis("Horizontal"), Input.GetAxis("Vertical") < 0);}
 
             if(Input.GetAxis("Mouse ScrollWheel") < 0 && mainCamera.orthographicSize < MaximoEspacioCamara){mainCamera.orthographicSize += 0.25f;}
             if(Input.GetAxis("Mouse ScrollWheel") > 0 && mainCamera.orthographicSize > MinimoEspacioCamara){mainCamera.orthographicSize -= 0.25f;}
@@ -54,13 +73,8 @@ public class PlayerComponent : MonoBehaviour
             else if(Input.GetKeyDown("5")){UI.ClickButton(5);}
 
 
-            Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-            for(int i = 0; i < ship.GetGunComponents().Length; i++){
-                GunComponent gun = ship.GetGunComponents()[i];
-                if(!gun.isAimed(mouse)){gun.Aim(mouse);}
-                if(Input.GetMouseButtonDown(0)){gun.Shoot();}
-            }
+            if(!ship.GunsAimed(mouse)){ship.Aim(mouse);}
+            if(ship.GunsAimed(mouse) && Input.GetMouseButtonDown(0)){ship.Shoot();}
         }
     }
 
@@ -69,6 +83,19 @@ public class PlayerComponent : MonoBehaviour
     public void Respawn(){
         transform.position = ship.spawnpoint.position;
         transform.rotation = ship.spawnpoint.rotation;
+    }
+
+    public void Pause(){
+        playing = !playing; UI.Pause(!playing); ai.playing = playing;
+        if(playing){Time.timeScale = 1f;}
+        else{Time.timeScale = 0f;}
+    }
+    public void Help(){
+        onHelp = !onHelp;
+        playing = !playing; ai.playing = playing;
+        UI.Help(!playing);
+        if(playing){Time.timeScale = 1f;}
+        else{Time.timeScale = 0f;}
     }
 
 }

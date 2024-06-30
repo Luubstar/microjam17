@@ -5,10 +5,14 @@ using System;
 
 public class ShipComponent : MonoBehaviour
 {
+    public static Color BLUE = new Color(61f/255, 118f/255, 200f/255);
+    public static Color RED = new Color(250f/255, 69f/255, 62f/255);
+
     public static int BLUETEAM = 1;
     public static int REDTEAM = -1;
     public static int NEUTRAL = 0;
     public bool alive = true;
+    public int vidaMax;
     [SerializeField] public Transform spawnpoint;
     [SerializeField] private SpriteRenderer casco;
     [SerializeField] private SpriteRenderer[] animacionHundirse;
@@ -24,20 +28,38 @@ public class ShipComponent : MonoBehaviour
     [SerializeField] public GunComponent[] gunComponents;
     [SerializeField] public TimeComponent time;
 
+    public GameObject Humo1;
+    public GameObject Humo2;
+    public GameObject Humo3;
+
     void Start(){
         for(int i = 0; i < gunComponents.Length; i++){
             gunComponents[i].SetShip(this);
             gunComponents[i].SetTime(time);
         }
 
-        if(equipo == BLUETEAM){casco.color = new Color(0f,0f,1f); icono.color = new Color(0f,0f,1f);}
-        else if(equipo == REDTEAM){casco.color = new Color(1f,0f,0f);icono.color = new Color(1f,0f,0f);}
+        if(equipo == BLUETEAM){casco.color = BLUE; icono.color = BLUE;}
+        else if(equipo == REDTEAM){casco.color = RED;icono.color = RED;}
     }
 
     void Update(){
         if(vida <= 0 && alive){
             alive = false;
             StartCoroutine("Hundirse");
+        }
+
+        if(vida > vidaMax - vidaMax/3){
+            Humo1.SetActive(false);
+            Humo3.SetActive(false);
+            Humo2.SetActive(false);
+        }
+        else if(vida <= vidaMax - (2*vidaMax)/3){
+            Humo1.SetActive(true);
+            Humo3.SetActive(true);
+            Humo2.SetActive(true);
+        }
+        else if(vida <= vidaMax - vidaMax/3){
+            Humo1.SetActive(true);
         }
     }
 
@@ -76,7 +98,18 @@ public class ShipComponent : MonoBehaviour
         return true;
     }
 
+    public bool canShoot(){
+        for(int i = 0; i < GetGunComponents().Length; i++){
+                GunComponent gun = GetGunComponents()[i];
+                if(!gun.canShoot()){return false;}
+            }
+        return true;
+    }
+
     IEnumerator Hundirse(){ 
+        if(gameObject.GetComponent<UnityEngine.AI.NavMeshAgent>() != null){
+            gameObject.GetComponent<UnityEngine.AI.NavMeshAgent>().isStopped = true;
+        }
         float v = 0f;
         while(v < 100f){
             float t = Mathf.Clamp01(Math.Abs(v) / 100f);
@@ -91,13 +124,17 @@ public class ShipComponent : MonoBehaviour
         if(gameObject.GetComponent<PlayerComponent>() != null){
             gameObject.GetComponent<PlayerComponent>().Respawn();
             alive = true;
-            vida = 12;
+            vida = vidaMax;
             gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
             foreach(SpriteRenderer r in animacionHundirse){
                 Color c = r.color;
                 c.a = 1;
                 r.color = c;
             }
+        }
+        else{
+            Debug.Log("Hundido");
+            gameObject.GetComponent<AIActorComponent>().master.Delete(gameObject.GetComponent<AIActorComponent>());
         }
     }
 }

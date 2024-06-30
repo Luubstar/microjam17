@@ -6,9 +6,12 @@ public class BulletComponent : MonoBehaviour
 {
     [SerializeField] private int TTL;
     private ShipComponent ship;
+    public GameObject Explosion;
     
     void Start()
-    {StartCoroutine("KillBullet");}
+    {
+        StartCoroutine("KillBullet");
+    }
 
     public void SetShip(ShipComponent s){ship = s;}
 
@@ -23,9 +26,13 @@ public class BulletComponent : MonoBehaviour
             ShipComponent collidingShip = col.gameObject.GetComponent<ShipComponent>();
             if(collidingShip.gameObject != ship.gameObject && collidingShip.GetEquipo() != ship.GetEquipo() && collidingShip.alive){
                 collidingShip.Dañar(ship.GetDañoBalas());
+                Instantiate(Explosion, gameObject.transform.position, gameObject.transform.rotation);
                 Destroy(this.gameObject);
             }
         }
-        else if(!col.isTrigger){Destroy(this.gameObject);}
+        else if(!col.isTrigger){
+            Instantiate(Explosion, gameObject.transform.position, gameObject.transform.rotation);
+            Destroy(this.gameObject);
+        }
     }
 }

@@ -11,6 +11,7 @@ public class MapGeneration : MonoBehaviour
     [SerializeField] private Transform[] primeraZona;
     [SerializeField] private Transform[] segundaZona;
     [SerializeField] public List<IslandComponent> islasGeneradas = new List<IslandComponent>();
+    
     void Start(){
         Generate();
     }

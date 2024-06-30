@@ -6,7 +6,8 @@ public class PointComponent : MonoBehaviour
 {
     [SerializeField] private int monedasJugador;
     public int monedasIA = 10;
-    private int cuentaIslas;
+    private float allyIslands;
+    private float enemyIslands;
     public bool puedeMejorarVelocidad = true;
     public bool puedeMejorarDaño = true;
     public bool puedeMejorarCañones = true;
@@ -18,9 +19,12 @@ public class PointComponent : MonoBehaviour
     int mejorasVelocidad;
     int mejorasBalas;
     int mejorasCañones;
-
+    int puntosBlue = 0;
+    int puntosRed = 0;
+    public AudioSource sourceCompra;
     void Start(){
         StartCoroutine("CoinGenerator");
+        CuentaIslas();
     }
 
     void Update(){
@@ -30,33 +34,40 @@ public class PointComponent : MonoBehaviour
     IEnumerator CoinGenerator(){
         while(true){
             yield return new WaitForSeconds(10);
-            int puntosBlue = 0;
-            int puntosRed = 0;
-            cuentaIslas = 0;
+            puntosBlue = 0;
+            puntosRed = 0;
             
-            List<IslandComponent> islas = map.GetIslasGeneradas();
-            foreach(IslandComponent i in islas){
-                if (i.GetEquipo() == ShipComponent.BLUETEAM){puntosBlue += 1; cuentaIslas+=1;}
-                else if (i.GetEquipo() == ShipComponent.REDTEAM){puntosRed += 1; cuentaIslas-=1;}
-            }
+            CuentaIslas();
 
             monedasIA += 10 * puntosRed;
             monedasJugador += 10 * puntosBlue;
         }
     }
 
-    public bool Ganas(){return cuentaIslas > 0;}
+    public void CuentaIslas(){
+        allyIslands = 0;
+        enemyIslands = 0;
+        List<IslandComponent> islas = map.GetIslasGeneradas();
+        foreach(IslandComponent i in islas){
+            if (i.GetEquipo() == ShipComponent.BLUETEAM){puntosBlue += 1; allyIslands+=1;}
+            else if (i.GetEquipo() == ShipComponent.REDTEAM){puntosRed += 1; enemyIslands+=1;}
+        }
+    }
+
+    public float Ganas(){return allyIslands/(enemyIslands+allyIslands);}
 
     public int GetMonedasJugador(){return monedasJugador;}
     public int GetMonedasIA(){return monedasIA;}
 
     public void GenerarAliado(){
+        sourceCompra.Play();
         if(monedasJugador >= 5 && aimaster.canAddAllies()){
             monedasJugador -= 5;
             player.GenerarAliado();
         }
     }
     public void RepararJugador(){
+        sourceCompra.Play();
         if(monedasJugador >= 10 && puedeCurarse){
             monedasJugador -= 10;
             player.GetComponent<ShipComponent>().SetVida(player.GetComponent<ShipComponent>().GetVida() + 4);
@@ -64,13 +75,16 @@ public class PointComponent : MonoBehaviour
         }
     }
     public void MejorarVelocidad(){
+        sourceCompra.Play();
         if(monedasJugador >= 10 && puedeMejorarVelocidad){
             mejorasVelocidad++;
             monedasJugador -= 10;
+            player.MejorarVelocidad();
             puedeMejorarVelocidad = mejorasVelocidad < 3;
         }
     }
     public void MejorarDaño(){
+        sourceCompra.Play();
         if(monedasJugador >= 15 && puedeMejorarDaño){
             mejorasBalas++;
             monedasJugador -= 15;
@@ -79,6 +93,7 @@ public class PointComponent : MonoBehaviour
         }
     }
     public void MejorarCañones(){
+        sourceCompra.Play();
         if(monedasJugador >= 20 && puedeMejorarCañones){
             mejorasCañones++;
             monedasJugador -= 20;

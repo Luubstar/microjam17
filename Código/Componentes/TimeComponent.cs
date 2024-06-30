@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 public class TimeComponent : MonoBehaviour
 {
-    [SerializeField] private int minutos;
-    [SerializeField] private int segundos;
+    [SerializeField] public int minutos;
+    [SerializeField] public int segundos;
+    public UIComponent UI;
     private PointComponent points;
 
     void Start(){
@@ -15,18 +16,23 @@ public class TimeComponent : MonoBehaviour
     public int GetSegundos(){
         return minutos*60 + segundos;
     }
+    
+    public override string ToString(){
+        if (segundos >= 10){return minutos + ":" + segundos;}
+        return minutos + ":0" + segundos;
+    }
 
     IEnumerator CountDown(){
         while (GetSegundos() > 0){
             segundos -= 1;
             if (segundos < 0 && minutos > 0){segundos = 59; minutos-=1;}
-            else{
-                if (points.Ganas()){} //TODO: Has ganado
-                else{} //TODO: Pierdes
-                //TODO: Volver al menú
-            } 
+            
             yield return new WaitForSeconds(1f);
         }
+        points.CuentaIslas();
+        if (points.Ganas() >= 0.5f){UI.Win(true);}
+        else{UI.Win(false);} 
+        Time.timeScale = 0f;
     }
 
 }

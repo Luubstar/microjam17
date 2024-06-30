@@ -130,7 +130,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 18
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -140,7 +140,7 @@ BoxCollider2D:
     m_Bits: 4294967295
   m_ContactCaptureLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2147483687
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -173,6 +173,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TTL: 3
+  Explosion: {fileID: 6856483457084133978, guid: 209434c960e55c24b9cd0e681e74f3b2, type: 3}
 --- !u!1 &7191934067710521790
 GameObject:
   m_ObjectHideFlags: 0
