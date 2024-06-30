@@ -7,7 +7,7 @@ public class IslandComponent : MonoBehaviour
     [SerializeField] private GameObject bandera;
     [SerializeField] private GameObject[] posiciones;
     [SerializeField] float velocidadConquista;
-    [SerializeField] int equipoConquistado = ShipComponent.NEUTRAL;
+    [SerializeField] public int equipoConquistado = ShipComponent.NEUTRAL;
     int direccionConquista;
     public float puntosDeConquista;
 

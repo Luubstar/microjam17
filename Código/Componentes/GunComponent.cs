@@ -4,13 +4,36 @@ using UnityEngine;
 public class GunComponent : MonoBehaviour
 {
     [SerializeField] private GameObject prefabBala;
+    [SerializeField] private GameObject[] cañonesNivel1;
+    [SerializeField] private GameObject[] cañonesNivel2;
+    [SerializeField] private GameObject[] cañonesNivel3;
+    [SerializeField] private GameObject[] cañonesNivel4;
+    private GameObject[] cañonesActivos;
     private int ultimoDisparo = -1;
     private TimeComponent time;
     private ShipComponent ship;
-
     private float horquillaAngulo = 1f;
+    int level = 1;
+
+    void Start(){
+        cañonesActivos = cañonesNivel1;
+    }
+
     public void SetShip(ShipComponent s){ship = s;}
     public void SetTime(TimeComponent t){time = t;}
+
+    public void UpdateLevel(){
+        level++;    
+        if(level==2){ActivarCañones(cañonesNivel2);}
+        else if(level==3){ActivarCañones(cañonesNivel3);}
+        else if(level==4){ActivarCañones(cañonesNivel4);}
+    }
+ 
+    public void ActivarCañones(GameObject[] c){
+        foreach(GameObject cañon in cañonesActivos){cañon.SetActive(false);}
+        foreach(GameObject cañon in c){cañon.SetActive(true);}
+        cañonesActivos = c;
+    }
 
     public void Aim(Vector3 pos){
         pos.z = 0;
@@ -32,11 +55,13 @@ public class GunComponent : MonoBehaviour
     public void Shoot(){
         if(canShoot()){
             ultimoDisparo = time.GetSegundos();
-            GameObject bullet = Instantiate(prefabBala, transform.position, transform.rotation);
-            Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-            bullet.GetComponent<BulletComponent>().SetShip(ship);
-            rb.velocity = ship.GetComponent<Rigidbody2D>().velocity;
-            rb.AddForce(transform.right * ship.GetFuerzaDeDisparo(), ForceMode2D.Impulse);
+            foreach(GameObject c in cañonesActivos){
+                GameObject bullet = Instantiate(prefabBala, c.transform.position, transform.rotation);
+                Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+                bullet.GetComponent<BulletComponent>().SetShip(ship);
+                rb.velocity = ship.GetComponent<Rigidbody2D>().velocity;
+                rb.AddForce(transform.right * ship.GetFuerzaDeDisparo(), ForceMode2D.Impulse);
+            }
         }
     }
 

@@ -10,7 +10,7 @@ public class MapGeneration : MonoBehaviour
     [SerializeField] private Transform[] coordsRocas;
     [SerializeField] private Transform[] primeraZona;
     [SerializeField] private Transform[] segundaZona;
-    [SerializeField] private List<IslandComponent> islasGeneradas = new List<IslandComponent>();
+    [SerializeField] public List<IslandComponent> islasGeneradas = new List<IslandComponent>();
     void Start(){
         Generate();
     }
@@ -45,6 +45,7 @@ public class MapGeneration : MonoBehaviour
 
         for(int i = 0; i < cant; i++){
             int j = Random.Range(0, pos.Length);
+            while(posiciones.Contains(pos[j])){j = Random.Range(0, pos.Length);}
             if (!posiciones.Contains(pos[j])){
                 posiciones.Add(pos[j]);
                 GameObject isla = Instantiate(islas[Random.Range(0, islas.Length)], new Vector3(pos[j].position.x, pos[j].position.y,1), new Quaternion(0,0,0,0));

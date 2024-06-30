@@ -9,11 +9,29 @@ public class PlayerComponent : MonoBehaviour
 {
     private MoveComponent moveComponent;
     private ShipComponent ship;
+    public AIMaster ai;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private float MaximoEspacioCamara;
     [SerializeField] private float MinimoEspacioCamara;
     [SerializeField] private UIComponent UI;
-    [SerializeField] private Transform spawnpoint;
+    [SerializeField] private GameObject IAAliado;
+    
+    public void GenerarAliado(){
+        GameObject IA = Instantiate(IAAliado, ship.spawnpoint.position, ship.spawnpoint.rotation);
+        IA.GetComponent<ShipComponent>().SetEquipo(ship.GetEquipo());
+        IA.GetComponent<AIActorComponent>().player = ship;
+        ai.AddAI(IA.GetComponent<AIActorComponent>());
+    }
+
+    public void MejorarVelocidad(){
+        ship.velocidadAvance += 0.05f;
+        ship.velocidadGiro += 0.001f;
+    }
+
+    public void MejorarCañones(){
+        foreach(GunComponent g in ship.gunComponents){g.UpdateLevel();}
+    }
+
     void Start()
     {
         moveComponent = gameObject.GetComponent<MoveComponent>();
@@ -49,7 +67,8 @@ public class PlayerComponent : MonoBehaviour
     public UIComponent GetUI(){return UI;} 
 
     public void Respawn(){
-        transform.position = spawnpoint.position;
+        transform.position = ship.spawnpoint.position;
+        transform.rotation = ship.spawnpoint.rotation;
     }
 
 }

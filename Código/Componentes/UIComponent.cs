@@ -12,6 +12,12 @@ public class UIComponent : MonoBehaviour
     [SerializeField] private TMP_Text conquistaText;
     [SerializeField] private GameObject botonMain;
     [SerializeField] private Button[] buttons;
+    [SerializeField] private Button vidaBoton;
+    [SerializeField] private Button balasBoton;
+    [SerializeField] private Button cañonesBoton;
+    [SerializeField] private Button velocidadBoton;
+    [SerializeField] private Button añadirIA;
+    public AIMaster aimaster;
     void Start()
     {
         time = gameObject.GetComponent<TimeComponent>();
@@ -24,6 +30,12 @@ public class UIComponent : MonoBehaviour
         tiempoText.SetText(time.GetSegundos() + " s");
         dineroText.SetText(points.GetMonedasJugador() + "$");
         conquistaText.SetText(points.Ganas() + " ");
+
+        velocidadBoton.interactable = points.puedeMejorarVelocidad;
+        balasBoton.interactable = points.puedeMejorarDaño;
+        cañonesBoton.interactable = points.puedeMejorarCañones;
+        vidaBoton.interactable = points.puedeCurarse;
+        añadirIA.interactable = aimaster.canAddAllies();
     }
 
     public void TurnButtons(bool mode){
@@ -31,7 +43,6 @@ public class UIComponent : MonoBehaviour
     }
 
     public void ClickButton(int button){
-        buttons[button-1].Select();
         buttons[button-1].onClick.Invoke();
     }
 }

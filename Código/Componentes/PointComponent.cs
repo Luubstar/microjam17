@@ -4,14 +4,27 @@ using UnityEngine;
 
 public class PointComponent : MonoBehaviour
 {
-    private int monedasJugador;
-    private int monedasIA = 10;
+    [SerializeField] private int monedasJugador;
+    public int monedasIA = 10;
     private int cuentaIslas;
+    public bool puedeMejorarVelocidad = true;
+    public bool puedeMejorarDaño = true;
+    public bool puedeMejorarCañones = true;
+    public bool puedeCurarse = false;
     [SerializeField] MapGeneration map;
-    [SerializeField] ShipComponent player;
+    [SerializeField] PlayerComponent player;
+    public AIMaster aimaster;
+
+    int mejorasVelocidad;
+    int mejorasBalas;
+    int mejorasCañones;
 
     void Start(){
         StartCoroutine("CoinGenerator");
+    }
+
+    void Update(){
+        puedeCurarse = player.GetComponent<ShipComponent>().GetVida() < 12;
     }
 
     IEnumerator CoinGenerator(){
@@ -37,36 +50,40 @@ public class PointComponent : MonoBehaviour
     public int GetMonedasJugador(){return monedasJugador;}
     public int GetMonedasIA(){return monedasIA;}
 
-    //TODO: Resto de compras
     public void GenerarAliado(){
-        if(monedasJugador >= 5){
+        if(monedasJugador >= 5 && aimaster.canAddAllies()){
             monedasJugador -= 5;
-            Debug.Log("Añadir Aliado");
+            player.GenerarAliado();
         }
     }
     public void RepararJugador(){
-        if(monedasJugador >= 10){
+        if(monedasJugador >= 10 && puedeCurarse){
             monedasJugador -= 10;
-            player.SetVida(player.GetVida() + 4);
-            if(player.GetVida() > 12){player.SetVida(12);}
+            player.GetComponent<ShipComponent>().SetVida(player.GetComponent<ShipComponent>().GetVida() + 4);
+            if(player.GetComponent<ShipComponent>().GetVida() > 12){player.GetComponent<ShipComponent>().SetVida(12);}
         }
     }
     public void MejorarVelocidad(){
-        if(monedasJugador >= 10){
+        if(monedasJugador >= 10 && puedeMejorarVelocidad){
+            mejorasVelocidad++;
             monedasJugador -= 10;
-            Debug.Log("Mejorar Velocidad");
+            puedeMejorarVelocidad = mejorasVelocidad < 3;
         }
     }
     public void MejorarDaño(){
-        if(monedasJugador >= 15){
+        if(monedasJugador >= 15 && puedeMejorarDaño){
+            mejorasBalas++;
             monedasJugador -= 15;
-            player.MejorarDaño();
+            player.GetComponent<ShipComponent>().MejorarDaño();
+            puedeMejorarVelocidad = mejorasVelocidad < 3;
         }
     }
     public void MejorarCañones(){
-        if(monedasJugador >= 20){
+        if(monedasJugador >= 20 && puedeMejorarCañones){
+            mejorasCañones++;
             monedasJugador -= 20;
-            Debug.Log("Mejorar Cañones");
+            player.MejorarCañones();
+            puedeMejorarVelocidad = mejorasCañones < 3;
         }
     }
 }

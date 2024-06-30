@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class ShipComponent : MonoBehaviour
 {
@@ -8,19 +9,21 @@ public class ShipComponent : MonoBehaviour
     public static int REDTEAM = -1;
     public static int NEUTRAL = 0;
     public bool alive = true;
+    [SerializeField] public Transform spawnpoint;
     [SerializeField] private SpriteRenderer casco;
+    [SerializeField] private SpriteRenderer[] animacionHundirse;
     [SerializeField] private SpriteRenderer icono;
     [SerializeField] private int vida;
     [SerializeField] private int equipo;
     [SerializeField] private float velocidadDeRotacionDeTorreta;
-    [SerializeField] private float velocidadAvance;
-    [SerializeField] private float velocidadGiro;
+    [SerializeField] public float velocidadAvance;
+    [SerializeField] public float velocidadGiro;
     [SerializeField] private float fuerzaDeDisparo;
     [SerializeField] private int dañobalas;
     [SerializeField] private int tiempoRecarga;
-    [SerializeField] private GunComponent[] gunComponents;
-    [SerializeField] private TimeComponent time;
-    
+    [SerializeField] public GunComponent[] gunComponents;
+    [SerializeField] public TimeComponent time;
+
     void Start(){
         for(int i = 0; i < gunComponents.Length; i++){
             gunComponents[i].SetShip(this);
@@ -29,6 +32,13 @@ public class ShipComponent : MonoBehaviour
 
         if(equipo == BLUETEAM){casco.color = new Color(0f,0f,1f); icono.color = new Color(0f,0f,1f);}
         else if(equipo == REDTEAM){casco.color = new Color(1f,0f,0f);icono.color = new Color(1f,0f,0f);}
+    }
+
+    void Update(){
+        if(vida <= 0 && alive){
+            alive = false;
+            StartCoroutine("Hundirse");
+        }
     }
 
     public GunComponent[] GetGunComponents(){return gunComponents;} 
@@ -41,17 +51,33 @@ public class ShipComponent : MonoBehaviour
     public int GetDañoBalas(){return dañobalas;}
     public int GetVida(){return vida;}
     public void SetVida(int v){vida = v;}
+    public void SetEquipo(int v){equipo = v;}
     public void MejorarDaño(){dañobalas++;}
-    public void Dañar(int daño){
-        vida -= daño;
-        if(vida < 0){
-            alive = false;
-            StartCoroutine("Hundirse");
-        }
-    }
+    public void Dañar(int daño){vida -= daño;}
 
-    IEnumerator Hundirse(){
-        yield return true;
-        //TODO: Animación hundirse
+
+    IEnumerator Hundirse(){ 
+        float v = 0f;
+        while(v < 100f){
+            float t = Mathf.Clamp01(Math.Abs(v) / 100f);
+            foreach(SpriteRenderer r in animacionHundirse){
+                Color c = r.color;
+                c.a = 1-t;
+                r.color = c;
+            }
+            v += 2;
+            yield return new WaitForSeconds(0.1f);
+        }
+        if(gameObject.GetComponent<PlayerComponent>() != null){
+            gameObject.GetComponent<PlayerComponent>().Respawn();
+            alive = true;
+            vida = 12;
+            gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+            foreach(SpriteRenderer r in animacionHundirse){
+                Color c = r.color;
+                c.a = 1;
+                r.color = c;
+            }
+        }
     }
 }

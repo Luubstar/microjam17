@@ -12,6 +12,5 @@ public class AIComponent : MonoBehaviour
 	public static void UpdateMesh()
     { 
         Surface2D.UpdateNavMesh(Surface2D.navMeshData);
-
     }
 }
